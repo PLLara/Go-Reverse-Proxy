@@ -11,9 +11,9 @@ import (
 func main() {
 	port := os.Getenv("PORT")
 	reverseProxy := httputil.NewSingleHostReverseProxy(&url.URL{})
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/proxy", func(w http.ResponseWriter, r *http.Request) {
 		// !
-		target := r.URL.Query().Get("proxy")
+		target := r.URL.Query().Get("q")
 		targetUrl, err := url.Parse(target)
 
 		// ?

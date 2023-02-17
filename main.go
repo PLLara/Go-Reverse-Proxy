@@ -6,15 +6,26 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"os"
+	"time"
 )
 
 func main() {
-	port := os.Getenv("PORT")
-	reverseProxy := httputil.NewSingleHostReverseProxy(&url.URL{})
+	var port = os.Getenv("PORT")
+	var reverseProxy = httputil.NewSingleHostReverseProxy(&url.URL{})
+	// timeout
+	reverseProxy.Transport = &http.Transport{
+		MaxIdleConns:          100,
+		MaxIdleConnsPerHost:   100,
+		MaxConnsPerHost:       100,
+		IdleConnTimeout:       10 * time.Second,
+		TLSHandshakeTimeout:   10 * time.Second,
+		ExpectContinueTimeout: 1 * time.Second,
+	}
+
 	http.HandleFunc("/proxy", func(w http.ResponseWriter, r *http.Request) {
 		// !
-		target := r.URL.Query().Get("q")
-		targetUrl, err := url.Parse(target)
+		var target = r.URL.Query().Get("q")
+		var targetUrl, err = url.Parse(target)
 
 		// ?
 		if target == "" || targetUrl == nil || err != nil {

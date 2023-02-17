@@ -13,7 +13,7 @@ func main() {
 	reverseProxy := httputil.NewSingleHostReverseProxy(&url.URL{})
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		// !
-		target := r.URL.Query().Get("target")
+		target := r.URL.Query().Get("proxy")
 		targetUrl, err := url.Parse(target)
 
 		// ?

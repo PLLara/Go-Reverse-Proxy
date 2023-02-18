@@ -48,6 +48,15 @@ func main() {
 			req.Header.Set("accept", "*/*")
 			req.Header.Set("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
 		}
+		reverseProxy.ModifyResponse = func(res *http.Response) error {
+			res.Header.Del("Access-Control-Allow-Origin")
+			res.Header.Del("Access-Control-Allow-Methods")
+			res.Header.Del("Access-Control-Allow-Headers")
+			res.Header.Del("Access-Control-Allow-Credentials")
+			res.Header.Del("Access-Control-Max-Age")
+			res.Header.Del("Access-Control-Expose-Headers")
+			return nil
+		}
 
 		// Serve the request using the reverse proxy
 		reverseProxy.ServeHTTP(w, r)

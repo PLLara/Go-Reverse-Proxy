@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"net/http/httputil"
@@ -10,9 +11,8 @@ import (
 )
 
 func main() {
-	var port = os.Getenv("PORT")
-	var reverseProxy = httputil.NewSingleHostReverseProxy(&url.URL{})
-	// timeout
+	port := os.Getenv("PORT")
+	reverseProxy := httputil.NewSingleHostReverseProxy(&url.URL{})
 	reverseProxy.Transport = &http.Transport{
 		MaxIdleConns:          100,
 		MaxIdleConnsPerHost:   100,
@@ -23,22 +23,20 @@ func main() {
 	}
 
 	http.HandleFunc("/proxy", func(w http.ResponseWriter, r *http.Request) {
-		// !
-		var target = r.URL.Query().Get("q")
-		var targetUrl, err = url.Parse(target)
+		// Get the target URL from the q parameter
+		target := r.URL.Query().Get("q")
+		targetUrl, err := url.Parse(target)
 
-		// ?
-		if target == "" || targetUrl == nil || err != nil {
-			http.Error(w, "Target URL not specified or invalid", http.StatusBadRequest)
+		if err != nil {
+			http.Error(w, "Target URL invalid", http.StatusBadRequest)
 			return
 		}
 
-		// !
+		// Set the director function to modify the request
 		reverseProxy.Director = func(req *http.Request) {
-			req.URL.Scheme = targetUrl.Scheme
-			req.URL.Host = targetUrl.Host
-			req.URL.Path = targetUrl.Path
+			req.URL = targetUrl
 			req.Host = targetUrl.Host
+
 			for header := range req.Header {
 				if header != "Range" {
 					if header != "range" {
@@ -51,10 +49,13 @@ func main() {
 			req.Header.Set("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
 		}
 
+		// Serve the request using the reverse proxy
 		reverseProxy.ServeHTTP(w, r)
 	})
 	if port == "" {
 		port = "8080"
 	}
+	fmt.Println("Server started on http://localhost:" + port)
+	// Start the server
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }

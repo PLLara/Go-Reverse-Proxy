@@ -1,3 +1,3 @@
-module example.com/greetings
+module proxy
 
 go 1.20

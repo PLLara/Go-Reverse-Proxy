@@ -48,12 +48,17 @@ func main() {
 			req.Header.Set("accept", "*/*")
 			req.Header.Set("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
 		}
+
 		reverseProxy.ModifyResponse = func(res *http.Response) error {
 			res.Header.Set("Access-Control-Allow-Origin", "*")
 			res.Header.Set("Access-Control-Allow-Methods", "*")
 			res.Header.Set("Access-Control-Allow-Headers", "*")
 			res.Header.Set("Access-Control-Allow-Credentials", "true")
 			res.Header.Set("Access-Control-Expose-Headers", "*")
+			// set infinite cache header
+			res.Header.Set("Cache-Control", "max-age=31536000")
+			res.Header.Set("Expires", "Thu, 31 Dec 2037 23:55:55 GMT")
+			res.Header.Set("Pragma", "cache")
 
 			return nil
 		}

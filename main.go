@@ -70,13 +70,13 @@ func main() {
 			req.Host = targetUrl.Host
 			req.Method = r.Method
 
-			// for header := range req.Header {
-			// 	if header != "Range" {
-			// 		if header != "range" {
-			// 			delete(req.Header, header)
-			// 		}
-			// 	}
-			// }
+			for header := range req.Header {
+				if header != "Range" {
+					if header != "range" {
+						delete(req.Header, header)
+					}
+				}
+			}
 
 			req.Header.Set("Accept-Encoding", "gzip, deflate, br")
 			req.Header.Set("accept", "*/*")

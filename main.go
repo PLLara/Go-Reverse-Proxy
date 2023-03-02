@@ -7,6 +7,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -25,8 +26,7 @@ func main() {
 	http.HandleFunc("/proxy", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Connection", "keep-alive")
 
-		// Get the target URL from the q parameter
-		target := r.URL.Query().Get("q")
+		target := strings.Replace(r.URL.RawQuery, "q=", "", 1)
 		targetUrl, err := url.Parse(target)
 
 		if err != nil {
@@ -38,18 +38,17 @@ func main() {
 		reverseProxy.Director = func(req *http.Request) {
 			req.URL = targetUrl
 			for header := range req.Header {
-				if header != "Range" {
-					if header != "range" {
-						delete(req.Header, header)
-					}
+				if header != "Range" && header != "range" {
+					delete(req.Header, header)
 				}
 			}
 
-			req.Header.Set("Accept-Encoding", "gzip, deflate, br")
-			req.Header.Set("accept", "*/*")
-			req.Header.Set("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
-
-			fmt.Println(req.URL)
+			req.Header.Set("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7")
+			req.Header.Set("accept-language", "pt-BR,pt;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6")
+			req.Header.Set("accept-encoding", "gzip, deflate, br")
+			req.Header.Set("referrer", "rule34.xxx")
+			req.Header.Set("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36 Edg/110.0.1587.57")
+			fmt.Println(targetUrl)
 		}
 
 		// CORS

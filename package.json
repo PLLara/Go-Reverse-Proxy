@@ -1,0 +1,6 @@
+{
+    "scripts":{
+        "dev": "fresh",
+        "deploy": "git add . && git commit -m 'deploy' && git push"
+    }
+}

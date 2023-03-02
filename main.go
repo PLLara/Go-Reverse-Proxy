@@ -25,35 +25,6 @@ func main() {
 	http.HandleFunc("/proxy", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Connection", "keep-alive")
 
-		// CORS
-		reverseProxy.ModifyResponse = func(res *http.Response) error {
-			res.Header.Set("Access-Control-Allow-Origin", "*")
-			res.Header.Set("Access-Control-Allow-Methods", "*")
-			res.Header.Set("Access-Control-Allow-Headers", "*")
-			res.Header.Set("Access-Control-Allow-Credentials", "true")
-			res.Header.Set("Access-Control-Expose-Headers", "*")
-			res.Header.Set("Cache-Control", "max-age=31536000")
-			res.Header.Set("Expires", "Thu, 31 Dec 2037 23:55:55 GMT")
-			res.Header.Set("Pragma", "cache")
-			res.Header.Set("Connection", "keep-alive")
-
-			return nil
-		}
-
-		// IF PREFLIGHT
-		if r.Method == "OPTIONS" {
-			w.Header().Set("Access-Control-Allow-Origin", "*")
-			w.Header().Set("Access-Control-Allow-Methods", "*")
-			w.Header().Set("Access-Control-Allow-Headers", "*")
-			w.Header().Set("Access-Control-Allow-Credentials", "true")
-			w.Header().Set("Access-Control-Expose-Headers", "*")
-			w.Header().Set("Cache-Control", "max-age=31536000")
-			w.Header().Set("Expires", "Thu, 31 Dec 2037 23:55:55 GMT")
-			w.Header().Set("Pragma", "cache")
-			w.WriteHeader(http.StatusOK)
-			return
-		}
-
 		// Get the target URL from the q parameter
 		target := r.URL.Query().Get("q")
 		targetUrl, err := url.Parse(target)
@@ -82,15 +53,18 @@ func main() {
 			req.Header.Set("accept", "*/*")
 			req.Header.Set("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
 		}
+
+		// CORS
 		reverseProxy.ModifyResponse = func(res *http.Response) error {
 			res.Header.Set("Access-Control-Allow-Origin", "*")
 			res.Header.Set("Access-Control-Allow-Methods", "*")
 			res.Header.Set("Access-Control-Allow-Headers", "*")
 			res.Header.Set("Access-Control-Allow-Credentials", "true")
 			res.Header.Set("Access-Control-Expose-Headers", "*")
-
+			res.Header.Set("Connection", "keep-alive")
 			return nil
 		}
+
 		reverseProxy.ServeHTTP(w, r)
 
 	})

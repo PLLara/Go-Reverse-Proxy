@@ -37,10 +37,6 @@ func main() {
 		// Set the director function to modify the request
 		reverseProxy.Director = func(req *http.Request) {
 			req.URL = targetUrl
-			req.URL.Scheme = "http"
-			req.Host = targetUrl.Host
-			req.Method = r.Method
-
 			for header := range req.Header {
 				if header != "Range" {
 					if header != "range" {
@@ -52,6 +48,8 @@ func main() {
 			req.Header.Set("Accept-Encoding", "gzip, deflate, br")
 			req.Header.Set("accept", "*/*")
 			req.Header.Set("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
+
+			fmt.Println(req.URL)
 		}
 
 		// CORS

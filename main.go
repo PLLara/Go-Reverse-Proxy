@@ -65,7 +65,9 @@ func main() {
 			res.Header.Set("Access-Control-Expose-Headers", "*")
 			res.Header.Set("Connection", "keep-alive")
 			if r.URL.Query().Get("d") == "1" {
-				res.Header.Set("Content-Disposition", "attachment; filename=download.file")
+				target := r.URL.Query().Get("q")
+				filename := strings.Split(target, "/")[len(strings.Split(target, "/"))-1]
+				res.Header.Set("Content-Disposition", "attachment; filename="+filename)
 			}
 			return nil
 		}

@@ -60,6 +60,9 @@ func main() {
 			res.Header.Set("Access-Control-Allow-Credentials", "true")
 			res.Header.Set("Access-Control-Expose-Headers", "*")
 			res.Header.Set("Connection", "keep-alive")
+			if r.URL.Query().Get("d") == "1" {
+				res.Header.Set("Content-Disposition", "attachment; filename=download.file")
+			}
 			return nil
 		}
 

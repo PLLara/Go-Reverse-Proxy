@@ -27,6 +27,10 @@ func main() {
 		w.Header().Set("Connection", "keep-alive")
 
 		target := strings.Replace(r.URL.RawQuery, "q=", "", 1)
+		if strings.HasPrefix(target, "d=1&") {
+			target = strings.Replace(target, "d=1&", "", 1)
+		}
+		fmt.Println(target)
 		targetUrl, err := url.Parse(target)
 
 		if err != nil {
